@@ -25,9 +25,7 @@ CREATE TABLE EMPLEAT (
     Nom VARCHAR(100),
     Telèfon VARCHAR(25),
     Salari INT,
-    naci_municipio VARCHAR(10),
+    naci_municipio INT,
     PRIMARY KEY (DNI_E),
-    FOREIGN KEY (naci_municipio) REFERENCES MUNICIPIS(Codi_municipi)
-
-);
+    FOREIGN KEY (naci_municipio) REFERENCES MUNICIPIS(Codi_municipi));
 
