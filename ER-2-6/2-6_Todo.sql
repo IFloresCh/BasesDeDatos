@@ -125,14 +125,38 @@ where pedido.id_cliente = cliente.id
 and cliente.nombre = 'Pepe' and cliente.apellido1 = 'Ruiz' and cliente.apellido2 = 'Santana'
 order by cantidad asc limit 1;
 
-
 -- Subconsultes amb ALL i ANY
 -- --------------------------
--- Retorna la comanda més cara que existeix en la taula demanat si fer ús de MAX, ORDER BY ni LIMIT.
+-- Retorna la comanda més cara que existeix en la taula demanat sin fer ús de MAX, ORDER BY ni LIMIT.
 -- 1
-select * 
+select *
 from pedido
-where cantidad != any
-(select cantidad from pedido);
+where cantidad >= all (
+select cantidad
+from pedido);
 
+-- Retorna un llistat dels clients que no han realitzat cap comanda. (Utilitzant ANY o ALL).
+-- 2
+select *
+from cliente
+where id != all 
+(select id_cliente
+from pedido);
+
+
+-- Retorna un llistat dels comercials que no han realitzat cap comanda. (Utilitzant ANY o ALL).
+-- 3
+select *
+from comercial
+where id != all 
+(select id_comercial
+from pedido);
+
+-- Subconsultes amb IN i NOT IN
+-- Retorna un llistat dels clients que no han realitzat cap comanda. (Utilitzant IN o NOT IN).
+-- 1
+
+
+-- Retorna un llistat dels comercials que no han realitzat cap comanda. (Utilitzant IN o NOT IN).
+-- 2
 
