@@ -331,30 +331,46 @@ having sum(producto.precio)>= 1000;
 -- Retorna un llistat amb el nom del producte més car que té cada fabricant. El resultat ha de tenir tres columnes: nom del producte, preu i nom del fabricant. El resultat ha d'estar ordenat alfabèticament de menor a major pel nom del fabricant.
 
 
-
 -- Subconsultes (Amb clàusules WHERE)
 -- Amb operadors bàsics de comparació
 -- (100% OK -> 0,5 punts).
 
 -- 1
 -- Retorna tots els productes del fabricador Lenovo. (Sense utilitzar INNER JOIN).
-select *
+select producto.nombre
 from producto, fabricante
-where producto.codigo = fabricante.codigo and fabricante.nombre = 'Lenovo';
+where producto.codigo_fabricante = fabricante.codigo and fabricante.nombre = 'Lenovo';
 
 -- 2 
 -- Retorna totes les dades dels productes que tenen el mateix preu que el producte més car del fabricador Lenovo. (Sense utilitzar INNER JOIN).
+select *
+from producto, fabricante
+where producto.precio = all(
+select precio
+from producto) 
+and producto.codigo_fabricante = fabricante.codigo ; -- ??????????????????????????????????????????????????????
+;
+
+
 
 -- 3
 -- Llista el nom del producte més car del fabricador Lenovo.
-select producto.nombre
+select producto.nombre, producto.precio
 from producto, fabricante
-where producto.codigo = fabricante.codigo
+where producto.codigo_fabricante = fabricante.codigo 
+and fabricante.nombre = 'Lenovo' 
+order by producto.precio desc limit 1;
 -- 4
 -- Llista el nom del producte més barat del fabricant Hewlett-Packard.
-
+select producto.nombre, producto.precio
+from producto, fabricante
+where producto.codigo_fabricante = fabricante.codigo 
+and fabricante.nombre = 'Hewlett-Packard' 
+order by producto.precio asc limit 1;
 -- 5
 -- Retorna tots els productes de la base de dades que tenen un preu major o igual al producte més car del fabricador Lenovo.
+select *
+from producto, fabricante;
 
 -- 6
 -- Llista tots els productes del fabricador Asus que tenen un preu superior al preu mitjà de tots els seus productes.
@@ -364,17 +380,29 @@ where producto.codigo = fabricante.codigo
 -- (100% OK -> 0,5 punts).
 
 -- Retorna el producte més car que existeix en la taula producte sense fer ús de MAX, ORDER BY ni LIMIT.
-
+select *
+from producto
+where precio >= all (
+select precio
+from producto);
 -- Retorna el producte més barat que existeix en la taula producte sense fer ús de MIN, ORDER BY ni LIMIT.
-
+select *
+from producto
+where precio <= all (
+select precio
+from producto);
 -- Retorna els noms dels fabricants que tenen productes associats. (Utilitzant ALL o ANY).
-
+select fabricante.nombre
+from producto, fabricante
+where (fabricante.codigo = producto.codigo_fabricante);
 -- Retorna els noms dels fabricants que no tenen productes associats. (Utilitzant ALL o ANY).
+select * from producto;
 
 -- Subconsultes amb IN i NOT IN
 -- (100% OK -> 0,5 punts).
 
 -- Retorna els noms dels fabricants que tenen productes associats. (Utilitzant IN o NOT IN).
+
 -- Retorna els noms dels fabricants que no tenen productes associats. (Utilitzant IN o NOT IN).
 
 
@@ -382,12 +410,34 @@ where producto.codigo = fabricante.codigo
 -- (100% OK -> 0,5 punts).
 
 -- Llista el nom de cada fabricant amb el nom i el preu del seu producte més car.
--- Retorna un llistat de tots els productes que tenen un preu major o igual a la mitjana de tots els productes del seu mateix fabricador.
--- Llista el nom del producte més car del fabricador Lenovo.
 
+-- Retorna un llistat de tots els productes que tenen un preu major o igual a la mitjana de tots els productes del seu mateix fabricador.
+
+-- Llista el nom del producte més car del fabricador Lenovo.
+select producto.nombre
+from producto, fabricante
+where producto.precio >= all (
+select producto.precio
+from producto)
+having producto.nombre = 'Lenovo';
 
 -- Subconsultes (Amb la clàusula HAVING)
 -- (100% OK -> 0,5 punts).
--
+
 -- Retorna un llistat amb tots els noms dels fabricants que tenen el mateix nombre de productes que el fabricant Lenovo.
+
+
+SELECT fabricante.nombre, COUNT(producto.codigo)
+FROM fabricante INNER JOIN producto
+ON fabricante.codigo = producto.codigo_fabricante
+GROUP BY fabricante.codigo
+HAVING COUNT(producto.codigo) >= (
+    SELECT COUNT(producto.codigo)
+    FROM fabricante INNER JOIN producto
+    ON fabricante.codigo = producto.codigo_fabricante
+    WHERE fabricante.nombre = 'Lenovo');
+              
+-- https://josejuansanchez.org/bd/unidad-09-teoria/index.html              
+-- 
+
 
