@@ -1,3 +1,32 @@
+
+Skip to content
+Pull requests
+Issues
+Marketplace
+Explore
+@IFloresCh
+IFloresCh /
+BasesDeDatos
+Public
+
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+
+    Settings
+
+BasesDeDatos/ER2-5/Selects2-5.sql
+@IFloresCh
+IFloresCh Create Selects2-5.sql
+Latest commit 043f5dc 2 days ago
+History
+1 contributor
+516 lines (462 sloc) 19.5 KB
 -- Consultes multitaula
 -- (Cada consulta OK val 0,5 punts. Tota 6,5 punts).
 
@@ -430,7 +459,7 @@ on fabricante.codigo = producto.codigo_fabricante
 where fabricante.nombre = 'Asus';
 -- 11
 -- Calcula la mitjana del preu de tots els productes del fabricador Asus.
-select avg(precio)
+select avg(precio) as 'avg Asus'
 from producto
 inner join fabricante
 on fabricante.codigo = producto.codigo_fabricante
@@ -441,58 +470,121 @@ select producto.precio as 'Asus menor'
 from producto
 inner join fabricante
 on fabricante.codigo = producto.codigo_fabricante
-where fabricante.nombre = 'Asus' 
-and producto.precio <= all (
-select precio
-from producto);
+where fabricante.nombre = 'Asus' order by producto.precio asc limit 1;
 -- 13
 -- Calcula el preu més car de tots els productes del fabricador Asus.
-
+select producto.precio as 'Asus mayor'
+from producto
+inner join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+where fabricante.nombre = 'Asus' order by producto.precio desc limit 1;
 -- 14
 -- Calcula la suma de tots els productes del fabricador Asus.
-
+select sum(producto.precio) as 'Total Asus'
+from producto
+inner join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+where fabricante.nombre = 'Asus';
 -- 15
 -- Mostra el preu màxim, preu mínim, preu mitjà i el nombre total de productes que té el fabricant Crucial.
-
+select count(*) as 'cantidad', max(producto.precio) as 'maximo', min(producto.precio) as 'minimo', avg(producto.precio) as 'avg'
+from producto
+inner join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+where fabricante.nombre = 'crucial';
 -- 16
 -- Mostra el nombre total de productes que té cadascun dels fabricants. El llistat també ha d'incloure els fabricants que no tenen cap producte. El resultat mostrarà dues columnes, una amb el nom del fabricador i una altra amb el nombre de productes que té. Ordena el resultat descendentemente pel nombre de productes.
-
+select fabricante.nombre, count(producto.precio) as 'cantidad'
+from producto
+right join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+group by fabricante.nombre
+order by count(producto.precio) desc; 
 -- 17
 -- Mostra el preu màxim, preu mínim i preu mitjà dels productes de cadascun dels fabricants. El resultat mostrarà el nom del fabricant juntament amb les dades que se sol·liciten.
-
+select fabricante.nombre, max(producto.precio) as 'maximo', min(producto.precio) as 'minimo', avg(producto.precio) as 'avg'
+from producto
+inner join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+group by fabricante.nombre;
 -- 18
 -- Mostra el preu màxim, preu mínim, preu mitjà i el nombre total de productes dels fabricants que tenen un preu mig superior a 200€. No és necessari mostrar el nom del fabricador, amb el codi del fabricador és suficient.
+select fabricante.codigo, max(producto.precio) as 'maximo', min(producto.precio) as 'minimo', avg(producto.precio) as 'avg'
+from producto
+inner join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+group by fabricante.codigo
+having avg(producto.precio) > 200 ;
 
 -- 19
 -- Mostra el nom de cada fabricant, juntament amb el preu màxim, preu mínim, preu mitjà i el nombre total de productes dels fabricants que tenen un preu mig superior a 200€. És necessari mostrar el nom del fabricant.
-
+select fabricante.nombre, max(producto.precio) as 'maximo', min(producto.precio) as 'minimo', avg(producto.precio) as 'avg'
+from producto
+inner join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+group by fabricante.nombre
+having avg(producto.precio) > 200 ;
 -- 20
 -- Calcula el nombre de productes que tenen un preu major o igual a 180€.
-
+select COUNT(*) 
+from producto 
+where precio >= 180;
 -- 21
 -- Calcula el nombre de productes que té cada fabricant amb un preu major o igual a 180€.
-
+select fabricante.nombre, count(producto.precio) as 'cantidad'
+from producto
+right join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+where producto.precio >= 180
+group by fabricante.nombre
+order by count(producto.precio) desc; 
 -- 22
 -- Llista el preu medio els productes de cada fabricant, mostrant solament el codi del fabricant.
+select fabricante.codigo, avg(producto.precio) as 'cantidad'
+from producto
+right join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+where producto.precio >= 180
+group by fabricante.codigo;
 
 -- 23
 -- Llista el preu medio els productes de cada fabricant, mostrant solament el nom del fabricant.
-
+select fabricante.nombre, avg(producto.precio) as 'precio medio'
+from producto
+right join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+group by fabricante.nombre;
 -- 24
 -- Llista els noms dels fabricants els productes dels quals tenen un preu mig major o igual a 150€.
-
+select fabricante.nombre, avg(producto.precio)
+from producto
+inner join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+group by fabricante.nombre
+having avg(producto.precio) >= 150;
 -- 25
 -- Retorna un llistat amb els noms dels fabricants que tenen 2 o més productes.
-
+select fabricante.nombre, count(*)
+from producto
+inner join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+group by fabricante.nombre
+having count(*) >= 2;
 -- 26
 -- Retorna un llistat amb els noms dels fabricants i el nombre de productes que té cadascun amb un preu superior o igual a 220 €. No és necessari mostrar el nom dels fabricants que no tenen productes que compleixin la condició.
-
--- 27
 -- Exemple del resultat esperat: 
 -- nom         total
 -- Lenovo     2
 -- Asus         1
 -- Crucial     1
+select fabricante.nombre, count(*)
+from producto
+inner join fabricante
+on fabricante.codigo = producto.codigo_fabricante
+where producto.precio >= 220
+group by fabricante.nombre;
+
+-- 27
 -- Retorna un llistat amb els noms dels fabricants i el nombre de productes que té cadascun amb un preu superior o igual a 220 €. El llistat ha de mostrar el nom de tots els fabricants, és a dir, si hi ha algun fabricant que no té productes amb un preu superior o igual a 220€ haurà d'aparèixer en el llistat amb un valor igual a 0 en el nombre de productes.
 -- 
 -- nom            total
@@ -506,11 +598,82 @@ from producto);
 -- Xiaomi            0
 -- Seagate        0
 -- 
+select fabricante.nombre, count(*)
+from fabricante
+right join producto
+on fabricante.codigo = producto.codigo_fabricante
+where producto.precio >= 220
+group by fabricante.nombre;-- -----------------------------????????????????????????????????
 
 -- 28
 -- Retorna un llistat amb els noms dels fabricants on la suma del preu de tots els seus productes és superior a 1000 €.
-
+select fabricante.nombre, sum(producto.precio)
+from fabricante
+right join producto
+on fabricante.codigo = producto.codigo_fabricante
+group by fabricante.nombre
+having sum(producto.precio)>= 1000;
 -- 29
 -- Retorna un llistat amb el nom del producte més car que té cada fabricant. El resultat ha de tenir tres columnes: nom del producte, preu i nom del fabricant. El resultat ha d'estar ordenat alfabèticament de menor a major pel nom del fabricant.
 
+
+
+-- Subconsultes (Amb clàusules WHERE)
+-- Amb operadors bàsics de comparació
+-- (100% OK -> 0,5 punts).
+
+-- 1
+-- Retorna tots els productes del fabricador Lenovo. (Sense utilitzar INNER JOIN).
+select *
+from producto, fabricante
+where producto.codigo = fabricante.codigo and fabricante.nombre = 'Lenovo';
+
+-- 2 
+-- Retorna totes les dades dels productes que tenen el mateix preu que el producte més car del fabricador Lenovo. (Sense utilitzar INNER JOIN).
+
+-- 3
+-- Llista el nom del producte més car del fabricador Lenovo.
+select producto.nombre
+from producto, fabricante
+where producto.codigo = fabricante.codigo
+-- 4
+-- Llista el nom del producte més barat del fabricant Hewlett-Packard.
+
+-- 5
+-- Retorna tots els productes de la base de dades que tenen un preu major o igual al producte més car del fabricador Lenovo.
+
+-- 6
+-- Llista tots els productes del fabricador Asus que tenen un preu superior al preu mitjà de tots els seus productes.
+
+
+-- Subconsultes amb ALL i ANY
+-- (100% OK -> 0,5 punts).
+
+-- Retorna el producte més car que existeix en la taula producte sense fer ús de MAX, ORDER BY ni LIMIT.
+
+-- Retorna el producte més barat que existeix en la taula producte sense fer ús de MIN, ORDER BY ni LIMIT.
+
+-- Retorna els noms dels fabricants que tenen productes associats. (Utilitzant ALL o ANY).
+
+-- Retorna els noms dels fabricants que no tenen productes associats. (Utilitzant ALL o ANY).
+
+-- Subconsultes amb IN i NOT IN
+-- (100% OK -> 0,5 punts).
+
+-- Retorna els noms dels fabricants que tenen productes associats. (Utilitzant IN o NOT IN).
+-- Retorna els noms dels fabricants que no tenen productes associats. (Utilitzant IN o NOT IN).
+
+
+-- Subconsultes “correlacionades”
+-- (100% OK -> 0,5 punts).
+
+-- Llista el nom de cada fabricant amb el nom i el preu del seu producte més car.
+-- Retorna un llistat de tots els productes que tenen un preu major o igual a la mitjana de tots els productes del seu mateix fabricador.
+-- Llista el nom del producte més car del fabricador Lenovo.
+
+
+-- Subconsultes (Amb la clàusula HAVING)
+-- (100% OK -> 0,5 punts).
+-
+-- Retorna un llistat amb tots els noms dels fabricants que tenen el mateix nombre de productes que el fabricant Lenovo.
 
