@@ -1,0 +1,2 @@
+Con el objeto XMLHttpRequest puede actualizar partes de una página web, sin recargar toda la página.
+El objeto XMLHttpRequest se utiliza para intercambiar datos con un servidor en segundo plano.
